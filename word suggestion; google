@@ -1,0 +1,116 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+class TrieNode {
+public:
+    char data;
+    TrieNode* children[26];
+    bool isTerminal;
+
+    TrieNode(char d) {
+        this->data = d;
+        for (int i = 0; i < 26; i++) {
+            children[i] = NULL;
+        }
+        this->isTerminal = false;
+    }
+};
+
+void insertWord(TrieNode* root, string word) {
+    if (word.length() == 0) {
+        root->isTerminal = true;
+        return;
+    }
+
+    char ch = word[0];
+    int index = ch - 'a';
+    TrieNode* child;
+
+    if (root->children[index] != NULL) {
+        child = root->children[index];
+    } else {
+        child = new TrieNode(ch);
+        root->children[index] = child;
+    }
+
+    insertWord(child, word.substr(1));
+}
+
+bool searchWord(TrieNode* root, string word) {
+    if (word.length() == 0) {
+        return root->isTerminal;
+    }
+
+    char ch = word[0];
+    int index = ch - 'a';
+    TrieNode* child;
+
+    if (root->children[index] != NULL) {
+        child = root->children[index];
+    } else {
+        return false;
+    }
+    return searchWord(child, word.substr(1));
+}
+
+void solve(TrieNode* root, vector<char>& ch, vector<string>& suggestions) {
+    if (root->isTerminal) {
+        string suggestion(ch.begin(), ch.end());
+        suggestions.push_back(suggestion);
+    }
+  // string suggestion(ch.begin(),ch.end()); and solve this by using the 
+  // and also solve
+    for (char t = 'a'; t <= 'z'; t++) {
+        int idx = t - 'a';
+        if (root->children[idx] != NULL) {
+            ch.push_back(t);
+            solve(root->children[idx], ch, suggestions);
+            ch.pop_back();
+        }
+    }
+}
+
+int main() {
+    TrieNode* root = new TrieNode('-');
+    // solve this please and pls solve by using the concept of the ; the // circle of the proof is that is that problem of 
+    // Insert words into the Trie
+    insertWord(root, "love");
+    insertWord(root, "lover");
+    insertWord(root, "loving");
+    insertWord(root, "lost");
+    insertWord(root, "lane");
+    insertWord(root, "last");
+    insertWord(root, "lord");
+
+    string st = "love";
+    vector<vector<string>> ans;
+    vector<char> ch;
+    TrieNode* prev = root;
+
+    for (int i = 0; i < st.size(); i++) {
+        vector<string> dp;
+        char c = st[i];
+        int idx = c - 'a';
+        ch.push_back(c);
+
+        if (root->children[idx] != NULL) {
+            root = root->children[idx];
+            solve(root, ch, dp); // Collect suggestions for the current prefix
+            ans.push_back(dp);
+        } else {
+            break;
+        }
+        prev = root;
+    }
+
+    // Output the suggestions
+    for (int i = 0; i < ans.size(); i++) {
+        cout << "Suggestions for prefix \"" << st.substr(0, i + 1) << "\": ";
+        for (const string& suggestion : ans[i]) {
+            cout << suggestion << " ";
+        }
+        cout << endl;
+    }
+
+    return 0;
+}
